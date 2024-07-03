@@ -1,4 +1,4 @@
-import { TextInput, View, Text, StyleSheet } from "react-native";
+import { TextInput, View, Text, StyleSheet, ViewStyle } from "react-native";
 
 interface TextInputProps {
   placeholder: string;
@@ -22,11 +22,12 @@ const TextField = ({ placeholder, onChangeText, value }: TextInputProps) => {
 
 export default TextField;
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create<{ textContainer: ViewStyle }>({
   textContainer: {
     borderRadius: 10,
     borderColor: "#2E8A466B",
-    borderWidth: 2,height: 56,
+    borderWidth: 2,
+    height: 56,
     width: "100%",
     marginTop: 16,
     paddingHorizontal: 10,

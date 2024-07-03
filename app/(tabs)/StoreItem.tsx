@@ -5,15 +5,17 @@ import {
   Text,
   TouchableOpacity,
   Alert,
+  StyleSheet
 } from "react-native";
 import { supabase } from "../../supabse";
 import TextField from "../../component/TextInput";
+import { CONST_STRING } from "../../libs/constant";
+import { IStoreStyle } from "../../models/Interface";
 
 const StoreItem = () => {
   const details = {
     location: useRef<string>(""),
   };
-
   const [location, setLocation] = useState();
   const [addLocationStatus, setAddLocationStatus] = useState<boolean>(false);
 
@@ -27,14 +29,10 @@ const StoreItem = () => {
       }
     );
 
-    console.log("Data::::", data);
-    console.log("Error::::", error);
   };
 
   const fetchLocation = async () => {
-    const { data, error } = await supabase.storage.getBucket('bucket');
-    if (error) console.error(error);
-    else console.log("All Buckets:::", data);
+
   };
 
   useEffect(() => {
@@ -47,21 +45,13 @@ const StoreItem = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ flex: 1, paddingHorizontal: 20 }}>
+      <View style={{paddingHorizontal: 20 }}>
         <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: 20,
-          }}
+          style={styles.container}
         >
-          <Text style={{ fontSize: 20 }}>Add Location</Text>
+          <Text style={{ fontSize: 20 }}>{CONST_STRING.ADD_LOCATION}</Text>
           <TouchableOpacity
-            style={{
-              padding: 10,
-              backgroundColor: "#E6E6E6",
-              borderRadius: 10,
-            }}
+            style={styles.addLocationBtn}
             onPress={addLocation}
           >
             <Text style={{ fontSize: 20 }}>+</Text>
@@ -70,14 +60,14 @@ const StoreItem = () => {
         {addLocationStatus && (
           <>
             <TextField
-              placeholder={"Enter Location"}
+              placeholder={CONST_STRING.ENTER_LOCATION}
               onChangeText={(text: string) => (details.location.current = text)}
             />
             <TouchableOpacity
               onPress={addLocality}
               style={{ alignSelf: "center", padding: 10 }}
             >
-              <Text>ADD</Text>
+              <Text>{CONST_STRING.ADD}</Text>
             </TouchableOpacity>
           </>
         )}
@@ -87,3 +77,16 @@ const StoreItem = () => {
 };
 
 export default StoreItem;
+
+const styles=StyleSheet.create<IStoreStyle>({
+  addLocationBtn:{
+      padding: 10,
+      backgroundColor: "#E6E6E6",
+      borderRadius: 10,
+  },
+  container:{
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+  }
+})

@@ -10,8 +10,6 @@ export default function App() {
     const value=await getToken();
     if(value?.length)
     router.navigate('(tabs)')
-
-    console.log("Value:>>>>>>",value);
   }
 useEffect(()=>{
   handleNavigation()

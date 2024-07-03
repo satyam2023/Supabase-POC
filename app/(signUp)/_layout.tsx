@@ -1,5 +1,5 @@
-import React, { useRef, useState } from "react";
-import { Alert, Pressable, Text, View } from "react-native";
+import React, { MutableRefObject, useRef, useState } from "react";
+import { Alert, Pressable, Text, View, ViewStyle } from "react-native";
 import TextField from "../../component/TextInput";
 import { supabase } from "../../supabse";
 import { StyleSheet } from "react-native";
@@ -7,11 +7,12 @@ import { SafeAreaView } from "react-native";
 import { useNavigation } from "expo-router";
 import { NativeStackNavigationProp } from "react-native-screens/lib/typescript/native-stack/types";
 import { setUserEmail, storeToken } from "../../utils/helper";
+import { CONST_STRING, ROUTES } from "../../libs/constant";
+import { IUserDetails } from "../../models/Interface";
 const SignLogInScreen = () => {
   const [signUpStatus, setSignUpStatus] = useState<boolean>(true);
-  const router=useNavigation() as unknown as NativeStackNavigationProp<any>;
-  const details = {
-    name: useRef<string>(""),
+  const router = useNavigation() as unknown as NativeStackNavigationProp<any>;
+  const details: IUserDetails= {
     email: useRef<string>(""),
     password: useRef<string>(""),
   };
@@ -23,55 +24,56 @@ const SignLogInScreen = () => {
       email: details.email.current,
       password: details.password.current,
     });
-
     if (error) Alert.alert(error.message);
     if (!session)
       Alert.alert("Please check your inbox for email verification!");
   }
 
-  const signIn=async()=>{
-    const res= await supabase.auth.signInWithPassword({
+  const signIn = async () => {
+    const res = await supabase.auth.signInWithPassword({
       email: details.email.current,
       password: details.password.current,
-    })
-
-    console.log("Result sigin::::",res);
-    if(res.error==null)
-    {
-     storeToken(res.data.session?.access_token);
-     setUserEmail(res?.data?.user?.email)
-     router.navigate('(tabs)')
+    });
+    if (res.error == null) {
+      storeToken(res.data.session?.access_token);
+      setUserEmail(res?.data?.user?.email);
+      router.navigate(ROUTES.TABS);
     }
-    
-  }
+  };
 
+  const handlePressEvent = () => {
+    signUpStatus && details?.password?.current.length > 5
+      ? signUpWithEmail()
+      : signIn();
+  };
 
-  
+  const btnText = signUpStatus ? CONST_STRING.SIGNUP : CONST_STRING.SIGNIN;
+  const handleSignUpStatus = () => setSignUpStatus(!signUpStatus);
+
+  const handleTextInput = (id: number, text: string) => {
+    details[Object.keys(details)[id]].current = text;
+  };
 
   return (
-    <SafeAreaView >
+    <SafeAreaView>
       <View style={{ paddingHorizontal: 20 }}>
-      <TextField
-        placeholder={"Enter Email"}
-        onChangeText={(text: string) => (details.email.current = text)}
-      />
-      <TextField
-        placeholder={"Enter Password"}
-        onChangeText={(text: string) => (details.password.current = text)}
-      />
-      <Pressable onPress={() => ( signUpStatus &&   details?.password?.current.length>5)?signUpWithEmail():signIn()} style={style.btn}>
-        <Text>{signUpStatus ? "SignUp" : "SignIn"}</Text>
-      </Pressable>
-      <Pressable
-        style={style.btn}
-        onPress={() => setSignUpStatus(!signUpStatus)}
-      >
-        <Text>
-          {`Already have a Account ?  ${
-            signUpStatus ? "Sign In" : "Sign Up"
-          }`}
-        </Text>
-      </Pressable>
+        {[CONST_STRING.ENTER_EMAIL, CONST_STRING.ENTER_PASS].map(
+          (item: string, index: number) => {
+            return (
+              <TextField
+                key={index}
+                placeholder={item}
+                onChangeText={(text: string) => handleTextInput(index, text)}
+              />
+            );
+          }
+        )}
+        <Pressable onPress={handlePressEvent} style={style.btn}>
+          <Text>{btnText}</Text>
+        </Pressable>
+        <Pressable style={style.btn} onPress={handleSignUpStatus}>
+          <Text>{`${CONST_STRING.ALREADY_ACC}${btnText}`}</Text>
+        </Pressable>
       </View>
     </SafeAreaView>
   );
@@ -79,7 +81,7 @@ const SignLogInScreen = () => {
 
 export default SignLogInScreen;
 
-const style = StyleSheet.create({
+const style = StyleSheet.create<{ btn: ViewStyle }>({
   btn: {
     padding: 10,
     height: 56,

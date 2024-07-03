@@ -10,15 +10,8 @@ import {
 import { supabase } from "../../supabse";
 import TextField from "../../component/TextInput";
 import { View } from "react-native";
-import { Link } from "expo-router";
-
-interface Itable {
-  id: string;
-  Values: string;
-  Created_By: string;
-  last_updated: string;
-  created_at: string;
-}
+import { IToDoStyle, Itable } from "../../models/Interface";
+import { CONST_STRING } from "../../libs/constant";
 
 const ToDoList = () => {
   const [toDoList, setTodoList] = useState<Itable[]>([]);
@@ -88,72 +81,51 @@ const ToDoList = () => {
     const { data, error } = await supabase.from("toDo").delete().eq("id", id);
     fetchTodoList();
   };
-  const fetchResolvetable = async () => {
-    try {
 
-    //  await supabase.from('resolve_Status').insert([{r_id:42,Resolved:"no",id:87 }])
-  const val = await supabase.from("resolve_Status").select();
-  // const { data, error } = await supabase
-  // .from('toDo')
-  // .select(`
-  //   id,
-  //    resolve_Status(Resolved)
-  // `).gt('id',40)
-  const { data, error } =  await supabase.rpc('retrieve_new3')
-
-   console.log("value::::",data);
-
-    } catch (e) {
-      console.error(e);
-    } finally {
-      
-    }
-  };
+  const btnText = updateItem != -1 ? CONST_STRING.UPDATE : CONST_STRING.ADD;
 
   useEffect(() => {
     fetchTodoList();
-    fetchResolvetable();
   }, []);
 
   const renderItem = ({ item }: { item: Itable; index: number }) => {
     return (
       <View style={styles.itemContainer}>
         <Text>
-          <Text style={styles.headingStyle}>ID: </Text>
+          <Text style={styles.headingStyle}>{CONST_STRING.ID} </Text>
           {item.id}
         </Text>
         <Text>
-          <Text style={styles.headingStyle}>Values: </Text>
+          <Text style={styles.headingStyle}>{CONST_STRING.Value} </Text>
           {item.Values}
         </Text>
         <View style={styles.delUpdContainer}>
           <Pressable style={styles.delBtn} onPress={() => deleteTask(item?.id)}>
-            <Text>Delete</Text>
+            <Text>{CONST_STRING.DELETE}</Text>
           </Pressable>
           <Pressable
             style={styles.updBtn}
             onPress={() => updateValue(item?.id)}
           >
-            <Text>Update</Text>
+            <Text>{CONST_STRING.UPDATE}</Text>
           </Pressable>
         </View>
       </View>
     );
   };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
-
-      <View style={{ paddingHorizontal: 20, flex: 1 }}>
+      <View style={{ paddingHorizontal: 20 }}>
         <View style={{ paddingHorizontal: 40 }}>
           <TextField
-            placeholder={"Enter To Do Task"}
+            placeholder={CONST_STRING.ENTER_TASK}
             onChangeText={(value: string) => (details.current = value)}
             value={details.current}
           />
-          <Pressable style={styles.addBtn} onPress={() => addTask()}>
-            <Text> {updateItem != -1 ? "Update" : "Add +"}</Text>
+          <Pressable style={styles.addBtn} onPress={addTask}>
+            <Text> {btnText}</Text>
           </Pressable>
-
         </View>
         {!loaderStatus ? (
           <FlatList
@@ -172,7 +144,7 @@ const ToDoList = () => {
 
 export default ToDoList;
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create<IToDoStyle>({
   addBtn: {
     justifyContent: "center",
     alignItems: "center",

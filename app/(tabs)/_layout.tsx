@@ -1,13 +1,13 @@
 import { Stack, Tabs, useRouter } from "expo-router"
-import { Pressable,Text } from "react-native";
 import { supabase } from "../../supabse";
+import { ROUTES } from "../../libs/constant";
 
 const layout=()=>{
  const router =useRouter();
   const signOutUser=async()=>{
     try{
     await supabase.auth.signOut();
-     // router.replace('(signUp)')
+     router.replace(ROUTES.SIGNUP)
     }
     catch(e){
      console.error(e);
@@ -17,15 +17,11 @@ const layout=()=>{
     <>
     <Stack.Screen/>
     <Tabs screenOptions={{
-    
       lazy: true,
-    // headerRight:()=><Pressable
-    // onPress={signOutUser}><Text>SignOut</Text></Pressable>
     }  
     }>
       <Tabs.Screen
       name="ToDoList"
-      
       />
       <Tabs.Screen
       name="ScoreCard"
